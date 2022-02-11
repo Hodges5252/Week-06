@@ -47,8 +47,7 @@ public:
     BNode(T&& t): data(std::move(t))
    {
       pLeft = pRight = pParent = nullptr;
-       //this->data = data;
-       //data = 0;
+       
    }
 
    //
@@ -122,11 +121,11 @@ inline void addLeft(BNode <T>* pNode, T && t)
     if (pNode->pLeft == nullptr)
     {
         pNode->pLeft = new BNode<T>;
-        pNode->pLeft->data = t;
+        pNode->pLeft->data = t; //This needs a (std::move(t))
     }
     else
     {
-        pNode->pLeft->data = t;
+        pNode->pLeft->data = t; //This needs a (std::move(t))
     }
 }
 
@@ -154,11 +153,11 @@ void addRight(BNode <T>* pNode, T && t)
     if (pNode->pRight == nullptr)
     {
         pNode->pRight = new BNode<T>;
-        pNode->pRight->data = t;
+        pNode->pRight->data = t; //This needs a (std::move(t))
     }
     else
     {
-        pNode->pRight->data = t;
+        pNode->pRight->data = t; //This needs a (std::move(t))
     }
 }
 
@@ -168,9 +167,20 @@ void addRight(BNode <T>* pNode, T && t)
  * using postfix traverse: LRV
  ****************************************************/
 template <class T>
-void clear(BNode <T> * & pThis)
+void clear(BNode <T> * & pThis) //this should be correct, but it dosen't raise the persentage at all
 {
-
+    if (pThis == nullptr)
+    {
+        return;
+    }
+    else
+    {
+        clear(pThis->pLeft);
+        
+        clear(pThis->pRight);
+        
+        delete pThis;
+    }
 }
 
 /***********************************************
@@ -206,5 +216,6 @@ BNode <T> * copy(const BNode <T> * pSrc)
 template <class T>
 void assign(BNode <T> * & pDest, const BNode <T>* pSrc)
 {
-
+    //pDest = copy(pSrc); <- this should call the copy function
+    pDest = pSrc; //<-this is the only thing that works rn
 }
