@@ -32,7 +32,7 @@ template <class T>
 class BNode
 {
 public:
-   // 
+   //
    // Construct
    //
    BNode()
@@ -67,12 +67,14 @@ public:
 template <class T>
 inline size_t size(const BNode <T> * p)
 {
-    T size = 0;
-/*    while (p->pLeft != nullptr)
-    {
-        size++;
-    }*/
-   return size;
+   if (p == nullptr)
+   {
+       return 0;
+   }
+   else
+   {
+       return size(p->pLeft) + 1 + size(p->pRight);
+   }
 }
 
 
@@ -103,14 +105,29 @@ inline void addRight (BNode <T> * pNode, BNode <T> * pAdd)
 template <class T>
 inline void addLeft (BNode <T> * pNode, const T & t)
 {
-    //pNode->pLeft->data = t;
+    if (pNode->pLeft == nullptr)
+    {
+        pNode->pLeft = new BNode<T>;
+        pNode->pLeft->data = t;
+    }
+    else
+    {
+        pNode->pLeft->data = t;
+    }
 }
 
 template <class T>
 inline void addLeft(BNode <T>* pNode, T && t)
 {
-    //pNode->pLeft->data = t;
-    t = 0;
+    if (pNode->pLeft == nullptr)
+    {
+        pNode->pLeft = new BNode<T>;
+        pNode->pLeft->data = t;
+    }
+    else
+    {
+        pNode->pLeft->data = t;
+    }
 }
 
 /******************************************************
@@ -120,14 +137,29 @@ inline void addLeft(BNode <T>* pNode, T && t)
 template <class T>
 void addRight (BNode <T> * pNode, const T & t)
 {
-    //pNode->pLeft->data = t;
+    if (pNode->pRight == nullptr)
+    {
+        pNode->pRight = new BNode<T>;
+        pNode->pRight->data = t;
+    }
+    else
+    {
+        pNode->pRight->data = t;
+    }
 }
 
 template <class T>
 void addRight(BNode <T>* pNode, T && t)
 {
-    //pNode->pLeft->data = t;
-    t = 0;
+    if (pNode->pRight == nullptr)
+    {
+        pNode->pRight = new BNode<T>;
+        pNode->pRight->data = t;
+    }
+    else
+    {
+        pNode->pRight->data = t;
+    }
 }
 
 /*****************************************************
