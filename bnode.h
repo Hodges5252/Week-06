@@ -181,7 +181,10 @@ void clear(BNode <T> * & pThis)
 template <class T>
 inline void swap(BNode <T>*& pLHS, BNode <T>*& pRHS)
 {
-
+    BNode<T>* potato;
+    potato = pLHS;
+    pLHS = pRHS;
+    pRHS = potato;
 }
 
 /**********************************************
@@ -192,7 +195,7 @@ inline void swap(BNode <T>*& pLHS, BNode <T>*& pRHS)
 template <class T>
 BNode <T> * copy(const BNode <T> * pSrc)
 {
-   return new BNode<T>;
+   return new BNode<T> ;
 }
 
 /**********************************************
