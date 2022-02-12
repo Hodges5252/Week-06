@@ -23,40 +23,41 @@
 #include <iostream>  // for OFSTREAM
 #include <cassert>
 
-/*****************************************************************
- * BNODE
- * A single node in a binary tree.  Note that the node does not know
- * anything about the properties of the tree so no validation can be done.
- *****************************************************************/
+ /*****************************************************************
+  * BNODE
+  * A single node in a binary tree.  Note that the node does not know
+  * anything about the properties of the tree so no validation can be done.
+  *****************************************************************/
 template <class T>
 class BNode
 {
 public:
-   //
-   // Construct
-   //
-   BNode()
-   {
-      pLeft = pRight = pParent = nullptr;
-   }
-   BNode(const T& t)
-   {
-      pLeft = pRight = pParent = nullptr;
-       this-> data = data;
-   }
-    BNode(T&& t): data(std::move(t))
-   {
-      pLeft = pRight = pParent = nullptr;
-       
-   }
+    //
+    // Construct
+    //
+    BNode()
+    {
+        pLeft = pRight = pParent = nullptr;
+    }
+    BNode(const T& t)
+    {
+        pLeft = pRight = pParent = nullptr;
+        data = t;
+    }
+    BNode(T&& t) : data(std::move(t))
+    {
+        pLeft = pRight = pParent = nullptr;
+        data = t;
+        //data = 0;
+    }
 
-   //
-   // Data
-   //
-   BNode <T>* pLeft;
-   BNode <T>* pRight;
-   BNode <T>* pParent;
-   T data;
+    //
+    // Data
+    //
+    BNode <T>* pLeft;
+    BNode <T>* pRight;
+    BNode <T>* pParent;
+    T data;
 };
 
 /*******************************************************************
@@ -64,16 +65,16 @@ public:
  * Return the size of a b-tree under the current node
  *******************************************************************/
 template <class T>
-inline size_t size(const BNode <T> * p)
+inline size_t size(const BNode <T>* p)
 {
-   if (p == nullptr)
-   {
-       return 0;
-   }
-   else
-   {
-       return size(p->pLeft) + 1 + size(p->pRight);
-   }
+    if (p == nullptr)
+    {
+        return 0;
+    }
+    else
+    {
+        return size(p->pLeft) + 1 + size(p->pRight);
+    }
 }
 
 
@@ -82,9 +83,10 @@ inline size_t size(const BNode <T> * p)
  * Add a node to the left of the current node
  ******************************************************/
 template <class T>
-inline void addLeft(BNode <T> * pNode, BNode <T> * pAdd)
+inline void addLeft(BNode <T>* pNode, BNode <T>* pAdd)
 {
     pNode->pLeft = pAdd;
+    pNode->pLeft->pParent = pNode;
 }
 
 /******************************************************
@@ -92,9 +94,10 @@ inline void addLeft(BNode <T> * pNode, BNode <T> * pAdd)
  * Add a node to the right of the current node
  ******************************************************/
 template <class T>
-inline void addRight (BNode <T> * pNode, BNode <T> * pAdd)
+inline void addRight(BNode <T>* pNode, BNode <T>* pAdd)
 {
     pNode->pRight = pAdd;
+    pNode->pRight->pParent = pNode;
 }
 
 /******************************************************
@@ -102,12 +105,12 @@ inline void addRight (BNode <T> * pNode, BNode <T> * pAdd)
  * Add a node to the left of the current node
  ******************************************************/
 template <class T>
-inline void addLeft (BNode <T> * pNode, const T & t)
+inline void addLeft(BNode <T>* pNode, const T& t)
 {
     if (pNode->pLeft == nullptr)
     {
-        pNode->pLeft = new BNode<T>;
-        pNode->pLeft->data = t;
+        pNode->pLeft = new BNode<T> (t);
+        pNode->pLeft->pParent = pNode;
     }
     else
     {
@@ -116,16 +119,18 @@ inline void addLeft (BNode <T> * pNode, const T & t)
 }
 
 template <class T>
-inline void addLeft(BNode <T>* pNode, T && t)
+inline void addLeft(BNode <T>* pNode, T&& t)
 {
-    if (pNode->pLeft == nullptr)
     {
-        pNode->pLeft = new BNode<T>;
-        pNode->pLeft->data = t; //This needs a (std::move(t))
-    }
-    else
-    {
-        pNode->pLeft->data = t; //This needs a (std::move(t))
+        if (pNode->pLeft == nullptr)
+        {
+            pNode->pLeft = new BNode<T> (t);
+            pNode->pLeft->pParent = pNode;
+        }
+        else
+        {
+            pNode->pLeft->data = t;
+        }
     }
 }
 
@@ -134,12 +139,12 @@ inline void addLeft(BNode <T>* pNode, T && t)
  * Add a node to the right of the current node
  ******************************************************/
 template <class T>
-void addRight (BNode <T> * pNode, const T & t)
+void addRight(BNode <T>* pNode, const T& t)
 {
     if (pNode->pRight == nullptr)
     {
-        pNode->pRight = new BNode<T>;
-        pNode->pRight->data = t;
+        pNode->pRight = new BNode<T>(t);
+        pNode->pRight->pParent = pNode;
     }
     else
     {
@@ -148,16 +153,16 @@ void addRight (BNode <T> * pNode, const T & t)
 }
 
 template <class T>
-void addRight(BNode <T>* pNode, T && t)
+void addRight(BNode <T>* pNode, T&& t)
 {
     if (pNode->pRight == nullptr)
     {
-        pNode->pRight = new BNode<T>;
-        pNode->pRight->data = t; //This needs a (std::move(t))
+        pNode->pRight = new BNode<T>(t);
+        pNode->pRight->pParent = pNode;
     }
     else
     {
-        pNode->pRight->data = t; //This needs a (std::move(t))
+        pNode->pRight->data = t;
     }
 }
 
@@ -167,20 +172,9 @@ void addRight(BNode <T>* pNode, T && t)
  * using postfix traverse: LRV
  ****************************************************/
 template <class T>
-void clear(BNode <T> * & pThis) //this should be correct, but it dosen't raise the persentage at all
+void clear(BNode <T>*& pThis)
 {
-    if (pThis == nullptr)
-    {
-        return;
-    }
-    else
-    {
-        clear(pThis->pLeft);
-        
-        clear(pThis->pRight);
-        
-        delete pThis;
-    }
+
 }
 
 /***********************************************
@@ -191,10 +185,9 @@ void clear(BNode <T> * & pThis) //this should be correct, but it dosen't raise t
 template <class T>
 inline void swap(BNode <T>*& pLHS, BNode <T>*& pRHS)
 {
-    BNode<T>* potato;
-    potato = pLHS;
-    pLHS = pRHS;
-    pRHS = potato;
+  //  if (pLHS != nullptr || pRHS != nullptr)
+  
+
 }
 
 /**********************************************
@@ -203,9 +196,30 @@ inline void swap(BNode <T>*& pLHS, BNode <T>*& pRHS)
  * pSrc->pLeft onto pDest->pLeft
  *********************************************/
 template <class T>
-BNode <T> * copy(const BNode <T> * pSrc)
+BNode <T>* copy(const BNode <T>* pSrc)
 {
-   return new BNode<T> ;
+    BNode <T>* subTree = nullptr;
+    if (pSrc != nullptr)
+    {
+        subTree = new BNode <T>;
+        subTree->data = pSrc->data;
+        subTree->pLeft = subTree->pRight = nullptr; // make a blank path
+        subTree->pParent = nullptr;
+
+
+        if (pSrc->pLeft != nullptr)
+        {
+            subTree->pLeft = copy(pSrc->pLeft);
+            subTree->pLeft->pParent = subTree;
+        }
+        if (pSrc->pRight != nullptr)
+        {
+            subTree->pRight = copy(pSrc->pRight);
+            subTree->pRight->pParent = subTree;
+        }
+        
+    }
+    return subTree;
 }
 
 /**********************************************
@@ -214,8 +228,7 @@ BNode <T> * copy(const BNode <T> * pSrc)
  * as many of the nodes as possible.
  *********************************************/
 template <class T>
-void assign(BNode <T> * & pDest, const BNode <T>* pSrc)
+void assign(BNode <T>*& pDest, const BNode <T>* pSrc)
 {
-    //pDest = copy(pSrc); <- this should call the copy function
-    pDest = pSrc; //<-this is the only thing that works rn
+
 }
