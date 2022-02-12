@@ -15,7 +15,7 @@
  *        BNode         : A class representing a BNode
  *    Additionally, it will contain a few functions working on Node
  * Author
- *    <your names here>
+ *    Samuel Ogilvie, Ethan Hodges, Jacob Nelson
  ************************************************************************/
 
 #pragma once
@@ -38,6 +38,7 @@ public:
     BNode()
     {
         pLeft = pRight = pParent = nullptr;
+        data = 0;
     }
     BNode(const T& t)
     {
